@@ -12,4 +12,4 @@
 > - **Discord.js**
 > - **string-similarity**
 
-**Use the command `~info` for more information.**
+**Use the command `~info` for more information**
