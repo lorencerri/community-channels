@@ -1,7 +1,6 @@
-#
-Community Channels
+# Community Channels
 
-##### Developed by [TrueXPixels](https://youtube.com/c/TrueXPixels) from [Plexi Development](https://discord.io/plexidev) \| Support / Community Discord: [https://discord.io/plexidev](https://discord.io/plexidev)
+##### Developed by [TrueXPixels](https://youtube.com/c/TrueXPixels) from [Plexi Development](https://discord.io/plexidev) \| Support / Community Discord: [https://discord.gg/plexidev](https://discord.gg/plexidev)
 
 ---
 
