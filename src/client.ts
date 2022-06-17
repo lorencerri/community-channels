@@ -21,7 +21,8 @@ export class Client extends SapphireClient {
 				'GUILD_MESSAGE_REACTIONS',
 				'DIRECT_MESSAGES',
 				'DIRECT_MESSAGE_REACTIONS'
-			]
+			],
+
 		})
 	}
 
@@ -29,6 +30,8 @@ export class Client extends SapphireClient {
 		container.db = new QuickDB();
 		return super.login(token);
 	}
+
+
 }
 
 declare module '@sapphire/pieces' {
