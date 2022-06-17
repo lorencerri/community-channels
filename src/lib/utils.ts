@@ -2,8 +2,9 @@ import { container } from '@sapphire/framework';
 import { send, } from '@sapphire/plugin-editable-commands';
 import { Message, MessageEmbed } from 'discord.js';
 import { RandomLoadingMessage } from './constants';
+import joinImages from 'join-images';
 import Jimp from 'jimp'
-import path from 'path';
+import path, { join } from 'path';
 
 /**
  * Picks a random item from an array
@@ -50,14 +51,14 @@ export async function getMessageFromUrl(url: String): Promise<any> {
  * Generate a list using JIMP
  * @param lines
  */
-export async function generateList(basePath: String, lines: String[]): Promise<any> {
+export async function generateList(basePath: string, lines: String[]): Promise<any> {
 
 	const PRIMARY_BACKGROUND_PATH = path.join(__dirname, '../../src/lib/assets/first.png');
 	const EXTRA_BACKGROUND_PATH = path.join(__dirname, '../../src/lib/assets/extra.png');
 
 	const font = await Jimp.loadFont(path.join(__dirname, '../../src/lib/assets/hypnoverse.fnt'));
 	let bg = await Jimp.read(PRIMARY_BACKGROUND_PATH);
-	let count = 0;
+	let buffers = [];
 
 	// Initial Page Data
 	let x = 60, y = 280, i = 0;
@@ -70,8 +71,7 @@ export async function generateList(basePath: String, lines: String[]): Promise<a
 		i++;
 		if (i % 41 === 0) break;
 	}
-	count++;
-	await bg.writeAsync(`${basePath}/${count}.png`)
+	buffers.push(await bg.getBufferAsync(Jimp.MIME_PNG));
 
 	// Additional Pages
 	while (lines.length !== i) {
@@ -86,9 +86,16 @@ export async function generateList(basePath: String, lines: String[]): Promise<a
 			ei++;
 			if (ei % 49 === 0) break;
 		}
-		count++;
-		await bg.writeAsync(`${basePath}/${count}.png`)
+		buffers.push(await bg.getBufferAsync(Jimp.MIME_PNG));
 	}
 
-	return count;
+	// Combine Images
+	let c = 0;
+	for (let i = 0; i < buffers.length; i += 2) {
+		const b = [buffers[i]];
+		if (buffers[i + 1]) b.push(buffers[i + 1]);
+		const joined = await joinImages(b, { direction: "horizontal" });
+		await joined.toFile(join(basePath, `${c++}.png`));
+	}
+	return c;
 }
