@@ -5,8 +5,7 @@ import {
 	CommandOptions,
 	RegisterBehavior,
 } from '@sapphire/framework';
-import { generateList } from '../../lib/utils';
-import { randomBytes } from 'crypto';
+import { getMessageFromUrl, updateGUI } from '../../lib/utils';
 
 @ApplyOptions<CommandOptions>({
 	name: 'gui',
@@ -18,31 +17,26 @@ import { randomBytes } from 'crypto';
 	},
 })
 
-// TODO: Rewrite this file, separate bottom half into utils file.
 export class CategoriesCommand extends Command {
 	async chatInputRun(interaction: Command.ChatInputInteraction) {
-		const { db } = container;
 
 		if (!interaction.guild) throw new Error('Sorry, this command can only run in guilds.');
 		if (!interaction.channel) throw new Error('Sorry, this command can only run in channels.');
 
-		// TODO: below
-		//const messageURL = String(interaction.options.get('message')?.value);
-		let message;
+		const messageURL = interaction.options.get('message')?.value || '';
 
-		message = await interaction.channel.send('> Generating...');
-		if (!message) return interaction.reply("> Unable to fetch message.");
+		if (messageURL) {
+			const message = await getMessageFromUrl(messageURL.toString());
+			if (!message) throw new Error("Unable to resolve messageURL to a message.");
+			await container.db.set(`gui_${interaction.guild.id}`, message.url);
+			interaction.reply(`Successfully set the message to be overwritten:\n\`${message.url}\``);
+		} else {
+			const message = await interaction.channel.send('> Generating GUI...');
+			await container.db.set(`gui_${interaction.guild.id}`, message.url);
+			interaction.reply(`Successfully created a new GUI message.`)
+		}
 
-		// TODO: Get the url from the database and parse it whenever you want to udpate the GUI
-		await db.set(`gui_${interaction.guild.id}`, message.url);
-
-		const base = `./files/${interaction.guild.id}`;
-		const count = await generateList(base, [...new Array(200)].map((_, i) => `Item #${i}`));
-		let reply = '';
-
-		for (let i = 1; i <= count; i++) reply += `https://community.plexidev.org/gui/${interaction.guild.id}/${i}.png?random=${randomBytes(4).toString('hex')} `;
-
-		message.edit(reply)
+		updateGUI(interaction.guild);
 	}
 
 	registerApplicationCommands(registry: Command.Registry) {
