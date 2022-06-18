@@ -6,6 +6,7 @@ import joinImages from 'join-images';
 import Jimp from 'jimp'
 import path, { join } from 'path';
 import { randomBytes } from 'crypto';
+import { promises } from 'fs';
 
 /**
  * Picks a random item from an array
@@ -59,16 +60,13 @@ export async function updateGUI(guild: Guild): Promise<any> {
 
 	// Fetch the joinable channels
 	const ids: String[] = await container.db.get(`categories_${guild.id}`) || [];
-	if (ids.length === 0) return;
 
 	// Fetch the GUI message
 	const url: String = await container.db.get(`gui_${guild.id}`) || '';
 	const message = await getMessageFromUrl(url);
-	if (!message) return;
 
 	const channels = await guild.channels.fetch();
 	const categories = channels.filter(c => c.type === 'GUILD_CATEGORY' && ids.includes(c.id));
-	if (categories.size === 0) return;
 
 	// Generate the channel list text
 	const channelList = [];
@@ -82,14 +80,14 @@ export async function updateGUI(guild: Guild): Promise<any> {
 
 	// Create the output text
 	const list = [
-		`Welcome to ${guild.name}!`,
-		`Here's all you need to surf the ${guild.name} Highway:`,
+		`Welcome   to   ${guild.name}!`,
+		`Here's   all   you   need   to   surf   the   ${guild.name}   Highway:`,
 		'',
-		'Want to join a page? Use the command:',
-		'/join <channel name>',
+		'Want   to   join   a   page?   Use   the   command:',
+		'/join   <channel   name>',
 		'',
-		'To leave, use the command:',
-		'/leave <channel name>',
+		'To   leave,   use   the   command:',
+		'/leave   <channel   name>',
 		'',
 		'',
 		...channelList
@@ -172,13 +170,21 @@ export async function generateList(basePath: string, lines: (string | string[])[
 		buffers.push(await bg.getBufferAsync(Jimp.MIME_PNG));
 	}
 
+	// Check if guild folder exists
+	const pre = join(__dirname, '../../', basePath);
+	try {
+		await promises.stat(pre);
+	} catch (e) {
+		await promises.mkdir(pre);
+	}
+
 	// Combine Images
 	let c = 0;
 	for (let i = 0; i < buffers.length; i += 2) {
 		const b = [buffers[i]];
 		if (buffers[i + 1]) b.push(buffers[i + 1]);
 		const joined = await joinImages(b, { direction: "horizontal" });
-		await joined.toFile(join(basePath, `${c++}.png`));
+		await joined.toFile(join(pre, `${c++}.png`));
 	}
 	return c;
 }

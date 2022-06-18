@@ -30,14 +30,14 @@ export class GUICommand extends Command {
 			const message = await getMessageFromUrl(messageURL.toString());
 			if (!message) throw new Error("Unable to resolve messageURL to a message.");
 			await container.db.set(`gui_${interaction.guild.id}`, message.url);
-			interaction.reply(`Successfully set the message to be overwritten:\n\`${message.url}\``);
+			interaction.reply({ content: `> Successfully set the message to be overwritten:\n\`${message.url}\``, ephemeral: true });
 		} else {
-			const message = await interaction.channel.send('> Generating GUI...');
+			const message = await interaction.channel.send('> Generating GUI, please wait...');
 			await container.db.set(`gui_${interaction.guild.id}`, message.url);
-			interaction.reply(`Successfully created a new GUI message.`)
+			interaction.reply({ content: `> Successfully created a new GUI message.`, ephemeral: true })
 		}
 
-		updateGUI(interaction.guild);
+		await updateGUI(interaction.guild);
 	}
 
 	registerApplicationCommands(registry: Command.Registry) {

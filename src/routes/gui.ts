@@ -14,9 +14,9 @@ export class UserRoute extends Route {
 		const { params } = request;
 		let { id, index } = params;
 
-		if (!id.match(/^[0-9a-f]{24}$/)) return response.status(404).end();
-		if (!index.match(/^[0-9]+$/)) return response.status(404).end();
+		if (!id.match(/^[0-9a-f]+$/)) return response.json({ message: "Invalid ID" });
 		if (index.includes('.')) index = index.split('.')[0];
+		if (!index.match(/^[0-9]+$/)) return response.json({ message: "Invalid Index" });
 
 		const stat = statSync(`./files/${id}/${index}.png`);
 		if (stat.isFile()) {

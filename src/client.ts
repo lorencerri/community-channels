@@ -22,7 +22,11 @@ export class Client extends SapphireClient {
 				'DIRECT_MESSAGES',
 				'DIRECT_MESSAGE_REACTIONS'
 			],
-
+			api: {
+				listenOptions: {
+					port: 4567
+				}
+			}
 		})
 	}
 
