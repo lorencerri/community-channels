@@ -59,8 +59,16 @@ export async function updateGUI(guild: Guild): Promise<any> {
 
 	// Fetch the joinable channels
 	const ids: String[] = await container.db.get(`categories_${guild.id}`) || [];
+	if (ids.length === 0) return;
+
+	// Fetch the GUI message
+	const url: String = await container.db.get(`gui_${guild.id}`) || '';
+	const message = await getMessageFromUrl(url);
+	if (!message) return;
+
 	const channels = await guild.channels.fetch();
 	const categories = channels.filter(c => c.type === 'GUILD_CATEGORY' && ids.includes(c.id));
+	if (categories.size === 0) return;
 
 	// Generate the channel list text
 	const channelList = [];
@@ -89,11 +97,6 @@ export async function updateGUI(guild: Guild): Promise<any> {
 
 	// Generate the images
 	const pageCount = await generateList(`./files/${guild.id}`, list);
-
-	// Update the original GUI message
-	const url: String = await container.db.get(`gui_${guild.id}`) || '';
-	const message = await getMessageFromUrl(url);
-	if (!message) throw new Error('No message found!');
 
 	let reply = '';
 	for (let i = 0; i < pageCount; i++) {
