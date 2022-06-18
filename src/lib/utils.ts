@@ -51,8 +51,8 @@ export async function getAllJoinableChannels(guild: Guild): Promise<any> {
 
 
 /**
- * Generate a list using JIMP
- * @param lines
+ * Update the GUI for a guild
+ * @param guild
  */
 
 export async function updateGUI(guild: Guild): Promise<any> {
@@ -66,7 +66,7 @@ export async function updateGUI(guild: Guild): Promise<any> {
 	const channelList = [];
 	for (const [_, category] of categories.entries()) {
 		if (category.type !== 'GUILD_CATEGORY') continue;
-		channelList.push(`<-----  ${category.name}  ----->`);
+		channelList.push(['Page Title', `<-----     ${category.name}     ----->`, 'Members']);
 		for (const [_, channel] of category.children.entries()) {
 			channelList.push([channel.name, channel.members.size.toLocaleString("en-US")]);
 		}
@@ -106,7 +106,7 @@ export async function updateGUI(guild: Guild): Promise<any> {
 }
 
 /**
- * TODO: Rewrite
+ * TODO: Rewrite and organize this
  * Generate a list using JIMP
  * @param lines
  */
@@ -125,9 +125,16 @@ export async function generateList(basePath: string, lines: (string | string[])[
 	// First Page
 	while (lines.length !== i) {
 		if (typeof lines[i] === 'string') bg.print(font, 60, y, lines[i]);
-		else {
+		else if (lines.length === 0) {
+			bg.print(font, 60, y, lines[i][0]);
+		}
+		else if (lines[i].length === 2) {
 			bg.print(font, 60, y, lines[i][0]);
 			bg.print(font, -60, y, { text: lines[i][1], alignmentX: Jimp.HORIZONTAL_ALIGN_RIGHT }, 1200, 60);
+		} else if (lines[i].length === 3) {
+			bg.print(font, 60, y, lines[i][0]);
+			bg.print(font, 0, y, { text: lines[i][1], alignmentX: Jimp.HORIZONTAL_ALIGN_CENTER }, 1200, 60);
+			bg.print(font, -60, y, { text: lines[i][2], alignmentX: Jimp.HORIZONTAL_ALIGN_RIGHT }, 1200, 60);
 		}
 		y += 40;
 		y += i % 6 ? 0 : 2;
@@ -143,9 +150,16 @@ export async function generateList(basePath: string, lines: (string | string[])[
 		let ei = 1;
 		while (lines.length !== i) {
 			if (typeof lines[i] === 'string') bg.print(font, 60, y, lines[i]);
-			else {
+			else if (lines.length === 0) {
+				bg.print(font, 60, y, lines[i][0]);
+			}
+			else if (lines[i].length === 2) {
 				bg.print(font, 60, y, lines[i][0]);
 				bg.print(font, -60, y, { text: lines[i][1], alignmentX: Jimp.HORIZONTAL_ALIGN_RIGHT }, 1200, 60);
+			} else if (lines[i].length === 3) {
+				bg.print(font, 60, y, lines[i][0]);
+				bg.print(font, 0, y, { text: lines[i][1], alignmentX: Jimp.HORIZONTAL_ALIGN_CENTER }, 1200, 60);
+				bg.print(font, -60, y, { text: lines[i][2], alignmentX: Jimp.HORIZONTAL_ALIGN_RIGHT }, 1200, 60);
 			}
 			y += 40;
 			i++;

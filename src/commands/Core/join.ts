@@ -6,6 +6,7 @@ import {
 	container,
 	RegisterBehavior,
 } from '@sapphire/framework';
+import { updateGUI } from '../../lib/utils';
 
 @ApplyOptions<CommandOptions>({
 	name: 'join',
@@ -29,7 +30,9 @@ export class CategoriesCommand extends Command {
 		if (!categoryIds.includes(channel.parentId)) throw new Error("Sorry, that channel is not joinable.");
 
 		channel.permissionOverwrites.edit(interaction.user, { SEND_MESSAGES: true });
-		return interaction.reply(`> Successully added you to ${channel.toString()}`)
+		await interaction.reply(`> Successully added you to ${channel.toString()}`);
+
+		await updateGUI(interaction.guild);
 	}
 
 	public async autocompleteRun(...[interaction]: Parameters<AutocompleteCommand['autocompleteRun']>) {
@@ -48,8 +51,7 @@ export class CategoriesCommand extends Command {
 			}
 		}
 
-		return interaction.respond(children)
-
+		return interaction.respond(children.slice(0, 25));
 	}
 
 	registerApplicationCommands(registry: Command.Registry) {

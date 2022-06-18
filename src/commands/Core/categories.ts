@@ -23,24 +23,28 @@ export class CategoriesCommand extends Command {
 		if (!interaction.guild) throw new Error('Sorry, this command can only run in guilds.');
 
 		const type = interaction.options.getSubcommand(true);
-		const id = String(interaction.options.get('id')?.value) || '';
+		const id = String(interaction.options.get('name')?.value) || '';
 
 		const categoryIds: String[] = await container.db.get(`categories_${interaction.guild.id}`) || [];
 
 		if (type === 'list') {
-			if (categoryIds.length === 0) return interaction.reply(`> No categories found!`)
+			if (categoryIds.length === 0) return interaction.reply(`> No categories found!`);
 			else {
 				const categories = interaction.guild.channels.cache.filter(c => categoryIds.includes(c.id));
 				return interaction.reply(`>>> **Categories**\n\`\`\`${categories.map(c => c.name).join('\n')}\`\`\``)
 			}
 		} else if (type === 'add') {
-			if (categoryIds.includes(id)) return interaction.reply("> That category is already added!")
+			if (categoryIds.includes(id)) return interaction.reply("> That category is already added!");
 			await container.db.push(`categories_${interaction.guild.id}`, id);
 			return interaction.reply('> Category Added!')
 		} else if (type === 'remove') {
-			if (!categoryIds.includes(id)) throw new Error("Category has not been added")
+			if (!categoryIds.includes(id)) throw new Error("Category has not been added!")
 			await container.db.pull(`categories_${interaction.guild.id}`, id)
 			return interaction.reply('> Category Removed!')
+		} else if (type === 'set') {
+			if (!categoryIds.includes(id)) throw new Error("Category has not been added!");
+			await container.db.set(`activeCategory_${interaction.guild.id}`, id);
+			return interaction.reply(`> The active category has been set to \`${id}\``);
 		}
 	}
 
@@ -55,11 +59,11 @@ export class CategoriesCommand extends Command {
 			if (!categories) throw new Error("Unable to fetch categories...");
 			if (categories.size === 0) return;
 
-			return interaction.respond(categories.map((c) => ({ name: c.name, value: c.id })))
-		} else if (type === 'remove') {
+			return interaction.respond(categories.map((c) => ({ name: c.name, value: c.id })).slice(0, 25))
+		} else if (type === 'remove' || type === 'set') {
 			const categoryIds: String[] = await container.db.get(`categories_${interaction.guild.id}`) || [];
 			const categories = interaction.guild.channels.cache.filter(c => categoryIds.includes(c.id) && c.name.toLowerCase().includes(query));
-			return interaction.respond(categories.map((c) => ({ name: c.name, value: c.id })))
+			return interaction.respond(categories.map((c) => ({ name: c.name, value: c.id })).slice(0, 25))
 		}
 	}
 
@@ -70,10 +74,13 @@ export class CategoriesCommand extends Command {
 				.setDescription('List or add a category to the joinable catalog')
 				.addSubcommand(subcommand => subcommand.setName('add').setDescription('Add category')
 					.addStringOption(option => //
-						option.setName('id').setDescription('The name of the piece to reload').setRequired(true).setAutocomplete(true)))
+						option.setName('name').setDescription('The name or ID of the category').setRequired(true).setAutocomplete(true)))
 				.addSubcommand(subcommand => subcommand.setName('remove').setDescription('Remove category')
 					.addStringOption(option => //
-						option.setName('id').setDescription('The name of the store to reload').setRequired(true).setAutocomplete(true)))
+						option.setName('name').setDescription('The name or ID of the category').setRequired(true).setAutocomplete(true)))
+				.addSubcommand(subcommand => subcommand.setName('set').setDescription('Set the category new channels are created in')
+					.addStringOption(option => //
+						option.setName('name').setDescription('The name or ID of the category').setRequired(true).setAutocomplete(true)))
 				.addSubcommand(subcommand => subcommand.setName('list').setDescription('List joinable categories')),
 			{ behaviorWhenNotIdentical: RegisterBehavior.Overwrite }
 		);

@@ -10,6 +10,7 @@ import { getMessageFromUrl, updateGUI } from '../../lib/utils';
 @ApplyOptions<CommandOptions>({
 	name: 'gui',
 	description: 'Creates a GUI of joininable channels.',
+	requiredUserPermissions: ['MANAGE_GUILD'],
 	requiredClientPermissions: ['EMBED_LINKS', 'MANAGE_CHANNELS'],
 	chatInputCommand: {
 		register: true,
