@@ -14,7 +14,7 @@ export class JoinInteractionHandler extends InteractionHandler {
 		const categoryIds: String[] = await container.db.get(`categories_${interaction.guild.id}`) || [];
 
 		const channel = await interaction.guild.channels.fetch(id);
-		if (!channel) throw new Error("Sorry, I could not find a channel with that ID.")
+		if (!channel) throw new Error("Sorry, I could not find a channel with that ID.");
 		if (!channel.parentId) throw new Error("Sorry, that channel is not part of a category.");
 		if (!categoryIds.includes(channel.parentId)) throw new Error("Sorry, that channel is not joinable.");
 
