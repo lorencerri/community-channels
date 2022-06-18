@@ -6,6 +6,7 @@ import {
 	container,
 	RegisterBehavior,
 } from '@sapphire/framework';
+import { MessageEmbed } from 'discord.js';
 
 @ApplyOptions<CommandOptions>({
 	name: 'categories',
@@ -27,24 +28,28 @@ export class CategoriesCommand extends Command {
 
 		const categoryIds: String[] = await container.db.get(`categories_${interaction.guild.id}`) || [];
 
+		const embed = new MessageEmbed()
+			.setColor(0x8087f6)
+			.setTitle(`Category: ${type}`)
+
 		if (type === 'list') {
-			if (categoryIds.length === 0) return interaction.reply(`> No categories found!`);
+			if (categoryIds.length === 0) return interaction.reply({ embeds: [embed.setDescription('No categories set.')] });
 			else {
 				const categories = interaction.guild.channels.cache.filter(c => categoryIds.includes(c.id));
-				return interaction.reply(`>>> **Categories**\n\`\`\`${categories.map(c => c.name).join('\n')}\`\`\``)
+				return interaction.reply({ embeds: [embed.setDescription(`>>> **Categories**\n\`\`\`${categories.map(c => c.name).join('\n')}\`\`\``)] });
 			}
 		} else if (type === 'add') {
 			if (categoryIds.includes(id)) return interaction.reply("> That category is already added!");
 			await container.db.push(`categories_${interaction.guild.id}`, id);
-			return interaction.reply('> Category Added!')
+			return interaction.reply({ embeds: [embed.setDescription('Category Added!')] });
 		} else if (type === 'remove') {
 			if (!categoryIds.includes(id)) throw new Error("Category has not been added!")
 			await container.db.pull(`categories_${interaction.guild.id}`, id)
-			return interaction.reply('> Category Removed!')
+			return interaction.reply({ embeds: [embed.setDescription('Category Removed!')] });
 		} else if (type === 'set') {
 			if (!categoryIds.includes(id)) throw new Error("Category has not been added!");
 			await container.db.set(`activeCategory_${interaction.guild.id}`, id);
-			return interaction.reply(`> The active category has been set to \`${id}\``);
+			return interaction.reply({ embeds: [embed.setDescription('The active category has been set to \`${id}\`')] });
 		}
 	}
 

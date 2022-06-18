@@ -23,16 +23,19 @@ export class CreateCommand extends Command {
 		const name = (interaction.options.get('name')?.value || '').toString();
 		const member = await interaction.guild.members.fetch(interaction.user.id);
 
+		const embed = new MessageEmbed()
+			.setColor(0x8349c3)
+
 		// Validate channel name
-		if (name.length === 0) return interaction.reply("> Please provide a channel name.")
+		if (name.length === 0) return interaction.reply({ embeds: [embed.setDescription('Please provide a channel name.')] })
 
 		// Check if they have the editor role
-		if (!member.roles.cache.find(r => r.name === 'Editor')) return interaction.reply('> Sorry, you need the editor role to create pages.');
+		if (!member.roles.cache.find(r => r.name === 'Editor')) return interaction.reply({ embeds: [embed.setDescription('Sorry, you need the editor role to create pages.')] })
 
 		// Check if they already are managers of 2 channels
 		const channels = await interaction.guild.channels.fetch();
 		const hasPermissionsIn = channels.filter(c => c.permissionsFor(member).has('MANAGE_CHANNELS')).size;
-		if (hasPermissionsIn >= 2 && !member.permissions.has('MANAGE_GUILD')) return interaction.reply("> Sorry, you're already managing 2 channels.");
+		if (hasPermissionsIn >= 2 && !member.permissions.has('MANAGE_GUILD')) return interaction.reply({ embeds: [embed.setDescription('Sorry, you\'re already managing 2 channels.')] })
 
 		// Get the active category
 		const categoryId: string = await this.container.db.get(`categories_${interaction.guild.id}`) || '';
@@ -49,15 +52,13 @@ export class CreateCommand extends Command {
 			},
 			{
 				id: interaction.user.id,
-				allow: ['VIEW_CHANNEL', 'SEND_MESSAGES', 'MANAGE_CHANNELS', 'MANAGE_MESSAGES', 'MANAGE_THREADS']
+				allow: ['VIEW_CHANNEL', 'SEND_MESSAGES', 'MANAGE_CHANNELS', 'MANAGE_MESSAGES']
 			}],
 			parent: category
 		});
 
 		// Send message in channel
-		const embed = new MessageEmbed()
-			.setColor(0x8349c3)
-			.setTitle(`Hello ${member.user.username}!`)
+		embed.setTitle(`Hello ${member.user.username}!`)
 			.setDescription(`I'm **Professor Helper**, let me introduce you to your new page in the wonderful world of **Hypnospace**!\n\nCurrently, you're the only person here. Although, others can join you by doing \`/join ${channel.name}\`, or by creating a \`/portal\` in another channel!\n\nLastly, while you have full permissions to manage this channel and send messages, others will only be able to view it.\n\nEnjoy!\n- Professor Helper`)
 			.setThumbnail('https://fs.plexidev.org/api/JBNtvtm.gif')
 			.setFooter({ text: 'And remember, Merchantsoft is always watching!' })
