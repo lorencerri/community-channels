@@ -18,7 +18,7 @@ import { getMessageFromUrl, updateGUI } from '../../lib/utils';
 	},
 })
 
-export class CategoriesCommand extends Command {
+export class GUICommand extends Command {
 	async chatInputRun(interaction: Command.ChatInputInteraction) {
 
 		if (!interaction.guild) throw new Error('Sorry, this command can only run in guilds.');

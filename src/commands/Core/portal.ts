@@ -6,18 +6,19 @@ import {
 	container,
 	RegisterBehavior,
 } from '@sapphire/framework';
+import { MessageActionRow, MessageButton, MessageEmbed } from 'discord.js';
 import { updateGUI } from '../../lib/utils';
 
 @ApplyOptions<CommandOptions>({
-	name: 'join',
-	description: 'Joins a channel.',
+	name: 'portal',
+	description: 'Creates a portal to a channel.',
 	requiredClientPermissions: ['EMBED_LINKS', 'MANAGE_CHANNELS'],
 	chatInputCommand: {
 		register: true,
 		guildIds: ['608178003393904650']
 	},
 })
-export class JoinCommand extends Command {
+export class PortalCommand extends Command {
 	async chatInputRun(interaction: Command.ChatInputInteraction) {
 		if (!interaction.guild) throw new Error('Sorry, this command can only run in guilds.');
 
@@ -29,9 +30,15 @@ export class JoinCommand extends Command {
 		if (!channel.parentId) throw new Error("Sorry, that channel is not part of a category.");
 		if (!categoryIds.includes(channel.parentId)) throw new Error("Sorry, that channel is not joinable.");
 
-		channel.permissionOverwrites.edit(interaction.user, { VIEW_CHANNEL: true });
-		await interaction.reply({ content: `> Successully added you to ${channel.toString()}`, ephemeral: true });
+		const embed = new MessageEmbed()
+			.setColor(0x8087f6)
+			.setTitle(`A portal to ${channel.name} was created!`)
+			.setDescription(`This channel current has ${channel.members.size.toLocaleString("en-US")} members.`)
+			.setFooter({ text: `This command was ran by ${interaction.user.tag}` });
 
+		const rows = new MessageActionRow().addComponents(new MessageButton().setLabel('Join').setCustomId(`join_${channel.id}`).setStyle('PRIMARY'));
+
+		await interaction.reply({ embeds: [embed], components: [rows] });
 		await updateGUI(interaction.guild);
 	}
 
@@ -58,10 +65,10 @@ export class JoinCommand extends Command {
 	registerApplicationCommands(registry: Command.Registry) {
 		registry.registerChatInputCommand((builder) =>
 			builder
-				.setName('join')
-				.setDescription('Joins a channel')
+				.setName('portal')
+				.setDescription('Creates a portal to a channel.')
 				.addStringOption(option => //
-					option.setName('name').setDescription('The name of the channel to join').setRequired(true).setAutocomplete(true)),
+					option.setName('name').setDescription('The name of the channel').setRequired(true).setAutocomplete(true)),
 			{ behaviorWhenNotIdentical: RegisterBehavior.Overwrite }
 		);
 	}

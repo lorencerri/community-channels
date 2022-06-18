@@ -16,7 +16,7 @@ import { updateGUI } from '../../lib/utils';
 		guildIds: ['608178003393904650']
 	},
 })
-export class CategoriesCommand extends Command {
+export class CreateCommand extends Command {
 	async chatInputRun(interaction: Command.ChatInputInteraction) {
 		if (!interaction.guild) throw new Error('> Sorry, this command can only run in guilds.');
 
@@ -25,6 +25,9 @@ export class CategoriesCommand extends Command {
 
 		// Validate channel name
 		if (name.length === 0) return interaction.reply("> Please provide a channel name.")
+
+		// Check if they have the editor role
+		if (!member.roles.cache.find(r => r.name === 'Editor')) return interaction.reply('> Sorry, you need the editor role to pages.');
 
 		// Check if they already are managers of 2 channels
 		const channels = await interaction.guild.channels.fetch();

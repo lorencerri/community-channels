@@ -17,11 +17,11 @@ import { updateGUI } from '../../lib/utils';
 		guildIds: ['608178003393904650']
 	},
 })
-export class CategoriesCommand extends Command {
+export class LeaveCommand extends Command {
 	async chatInputRun(interaction: Command.ChatInputInteraction) {
 		if (!interaction.guild) throw new Error('Sorry, this command can only run in guilds.');
 
-		const id = String(interaction.options.get('id')?.value) || '';
+		const id = String(interaction.options.get('name')?.value) || '';
 		const categoryIds: String[] = await container.db.get(`categories_${interaction.guild.id}`) || [];
 
 		const channel = await interaction.guild.channels.fetch(id);
@@ -51,8 +51,8 @@ export class CategoriesCommand extends Command {
 
 		for (const [_, category] of categories) {
 			if (category.type === 'GUILD_CATEGORY') {
-				for (const [_, child] of category.children) {
-					if (child.name.toLowerCase().includes(query)) children.push({ name: child.name, value: child.id })
+				for (const [_, channel] of category.children) {
+					if (channel.name.toLowerCase().includes(query)) children.push({ name: channel.name, value: channel.id })
 				}
 			}
 		}
@@ -66,7 +66,7 @@ export class CategoriesCommand extends Command {
 				.setName('leave')
 				.setDescription('Leaves a channel')
 				.addStringOption(option => //
-					option.setName('id').setDescription('The name of the channel to leave').setRequired(true).setAutocomplete(true)),
+					option.setName('name').setDescription('The name of the channel to leave').setRequired(true).setAutocomplete(true)),
 			{ behaviorWhenNotIdentical: RegisterBehavior.Overwrite }
 		);
 	}
