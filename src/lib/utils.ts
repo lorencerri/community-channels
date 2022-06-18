@@ -64,18 +64,26 @@ export async function updateGUI(guild: Guild): Promise<any> {
 	// Fetch the GUI message
 	const url: String = await container.db.get(`gui_${guild.id}`) || '';
 	const message = await getMessageFromUrl(url);
+	if (!message) return;
 
 	const channels = await guild.channels.fetch();
-	const categories = channels.filter(c => c.type === 'GUILD_CATEGORY' && ids.includes(c.id));
+	const categories = channels.filter(c => c.type === 'GUILD_CATEGORY' && ids.includes(c.id)).sort((a, b) => b.name.charCodeAt(0) - a.name.charCodeAt(0));
 
 	// Generate the channel list text
+	const headers: string[] = [];
 	const channelList = [];
 	let count = 0;
 	for (const [_, category] of categories.entries()) {
 		if (category.type !== 'GUILD_CATEGORY') continue;
-		channelList.push(['Page Title', `<-----     ${category.name}     ----->`, 'Members']);
+		if (!headers.includes(category.name)) {
+			channelList.push('');
+			channelList.push(['Page   Title', `<-----     ${category.name}     ----->`, 'Members']);
+			headers.push(category.name);
+		}
 		for (const [_, channel] of category.children.entries()) {
-			channelList.push([channel.name, channel.members.size.toLocaleString("en-US")]);
+			let name = channel.name;
+			if (name.length > 50) name = `${name.substring(0, 40)}...`;
+			channelList.push([name, channel.permissionOverwrites.cache.size.toLocaleString("en-US")]);
 			count++;
 		}
 	}
@@ -93,7 +101,6 @@ export async function updateGUI(guild: Guild): Promise<any> {
 		'',
 		`There   are   currently   ${count}   pages   on   the   ${guild.name}   highway.`,
 		'',
-		'',
 		...channelList
 	];
 
@@ -103,7 +110,7 @@ export async function updateGUI(guild: Guild): Promise<any> {
 	let reply = '';
 	for (let i = 0; i < pageCount; i++) {
 		const randomString = `r=${randomBytes(2).toString('hex')}`;
-		reply += `https://community.plexidev.org/gui/${guild.id}/${i}.png?${randomString}`;
+		reply += `https://community.plexidev.org/gui/${guild.id}/${i}.png?${randomString} `;
 	}
 	message.edit(reply);
 
@@ -190,5 +197,6 @@ export async function generateList(basePath: string, lines: (string | string[])[
 		const joined = await joinImages(b, { direction: "horizontal" });
 		await joined.toFile(join(pre, `${c++}.png`));
 	}
+	console.log(`Generated ${c} pages.`);
 	return c;
 }
