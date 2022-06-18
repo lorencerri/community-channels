@@ -49,7 +49,7 @@ export class CreateCommand extends Command {
 			},
 			{
 				id: interaction.user.id,
-				allow: ['VIEW_CHANNEL', 'MANAGE_CHANNELS', 'MANAGE_MESSAGES', 'MANAGE_THREADS']
+				allow: ['VIEW_CHANNEL', 'SEND_MESSAGES', 'MANAGE_CHANNELS', 'MANAGE_MESSAGES', 'MANAGE_THREADS']
 			}],
 			parent: category
 		});
@@ -58,7 +58,7 @@ export class CreateCommand extends Command {
 		const embed = new MessageEmbed()
 			.setColor(0x8349c3)
 			.setTitle(`Hello ${member.user.username}!`)
-			.setDescription(`I'm **Professor Helper**, let me introduce you to your new page in the wonderful world of **Hypnospace**!\n\nCurrently, you're the only person here. Although, others can join you by doing \`/join ${channel.name}\`, or by creating a \`/portal\` in another channel!\n\nLastly, while you have full permissions to manage this channel and send messages, others will only be able to view. But don't fret, you can create threads if you want to communicate with them!\n\nEnjoy!\n- Professor Helper`)
+			.setDescription(`I'm **Professor Helper**, let me introduce you to your new page in the wonderful world of **Hypnospace**!\n\nCurrently, you're the only person here. Although, others can join you by doing \`/join ${channel.name}\`, or by creating a \`/portal\` in another channel!\n\nLastly, while you have full permissions to manage this channel and send messages, others will only be able to view it.\n\nEnjoy!\n- Professor Helper`)
 			.setThumbnail('https://fs.plexidev.org/api/JBNtvtm.gif')
 			.setFooter({ text: 'And remember, Merchantsoft is always watching!' })
 

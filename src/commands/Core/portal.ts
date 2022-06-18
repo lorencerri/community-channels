@@ -8,6 +8,8 @@ import {
 } from '@sapphire/framework';
 import { MessageActionRow, MessageButton, MessageEmbed } from 'discord.js';
 import { updateGUI } from '../../lib/utils';
+import TimeAgo from 'javascript-time-ago'
+import en from 'javascript-time-ago/locale/en'
 
 @ApplyOptions<CommandOptions>({
 	name: 'portal',
@@ -24,19 +26,24 @@ export class PortalCommand extends Command {
 
 		const id = String(interaction.options.get('name')?.value) || '';
 		const categoryIds: String[] = await container.db.get(`categories_${interaction.guild.id}`) || [];
+		if (!id.match(/^[0-9]+$/)) return interaction.reply({ content: `> Sorry, that does not look like a valid channel.`, ephemeral: true });
 
 		const channel = await interaction.guild.channels.fetch(id);
-		if (!channel) throw new Error("Sorry, I could not find a channel with that ID.")
-		if (!channel.parentId) throw new Error("Sorry, that channel is not part of a category.");
-		if (!categoryIds.includes(channel.parentId)) throw new Error("Sorry, that channel is not joinable.");
+		if (!channel) return await interaction.reply({ content: `> Sorry, I could not find a channel with the specified ID.`, ephemeral: true });
+		if (!channel.parentId) return await interaction.reply({ content: `> Sorry, that channel is not part of a valid category.`, ephemeral: true });
+		if (!categoryIds.includes(channel.parentId)) return await interaction.reply({ content: `> Sorry, that channel is not joinable.`, ephemeral: true });
+
+		TimeAgo.addDefaultLocale(en);
+		const timeAgo = (new TimeAgo('en-US')).format(channel.createdTimestamp)
 
 		const embed = new MessageEmbed()
 			.setColor(0x8087f6)
-			.setTitle(`A portal to ${channel.name} was created!`)
-			.setDescription(`This channel current has ${channel.members.size.toLocaleString("en-US")} members.`)
-			.setFooter({ text: `This command was ran by ${interaction.user.tag}` });
+			.setThumbnail('https://fs.plexidev.org/api/UzNMDpe.gif')
+			.setTitle('A Portal Was Created!')
+			.setDescription(`**#${channel.name}** has ${channel.members.size.toLocaleString("en-US")} members and was created ${timeAgo}.`)
+			.setFooter({ text: `Portal created by ${interaction.user.tag}.` })
 
-		const rows = new MessageActionRow().addComponents(new MessageButton().setLabel('Join').setCustomId(`join_${channel.id}`).setStyle('PRIMARY'));
+		const rows = new MessageActionRow().addComponents(new MessageButton().setLabel('Join Page').setCustomId(`join_${channel.id}`).setStyle('PRIMARY'));
 
 		await interaction.reply({ embeds: [embed], components: [rows] });
 		await updateGUI(interaction.guild);

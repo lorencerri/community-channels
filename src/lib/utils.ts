@@ -70,11 +70,13 @@ export async function updateGUI(guild: Guild): Promise<any> {
 
 	// Generate the channel list text
 	const channelList = [];
+	let count = 0;
 	for (const [_, category] of categories.entries()) {
 		if (category.type !== 'GUILD_CATEGORY') continue;
 		channelList.push(['Page Title', `<-----     ${category.name}     ----->`, 'Members']);
 		for (const [_, channel] of category.children.entries()) {
 			channelList.push([channel.name, channel.members.size.toLocaleString("en-US")]);
+			count++;
 		}
 	}
 
@@ -88,6 +90,8 @@ export async function updateGUI(guild: Guild): Promise<any> {
 		'',
 		'To   leave,   use   the   command:',
 		'/leave   <channel   name>',
+		'',
+		`There   are   currently   ${count}   pages   on   the   ${guild.name}   highway.`,
 		'',
 		'',
 		...channelList

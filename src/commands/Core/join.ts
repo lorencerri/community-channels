@@ -23,11 +23,12 @@ export class JoinCommand extends Command {
 
 		const id = String(interaction.options.get('name')?.value) || '';
 		const categoryIds: String[] = await container.db.get(`categories_${interaction.guild.id}`) || [];
+		if (!id.match(/^[0-9]+$/)) return interaction.reply({ content: `> Sorry, that does not look like a valid channel.`, ephemeral: true });
 
 		const channel = await interaction.guild.channels.fetch(id);
-		if (!channel) throw new Error("Sorry, I could not find a channel with that ID.")
-		if (!channel.parentId) throw new Error("Sorry, that channel is not part of a category.");
-		if (!categoryIds.includes(channel.parentId)) throw new Error("Sorry, that channel is not joinable.");
+		if (!channel) return await interaction.reply({ content: `> Sorry, I could not find a channel with the specified ID.`, ephemeral: true });
+		if (!channel.parentId) return await interaction.reply({ content: `> Sorry, that channel is not part of a valid category.`, ephemeral: true });
+		if (!categoryIds.includes(channel.parentId)) return await interaction.reply({ content: `> Sorry, that channel is not joinable.`, ephemeral: true });
 
 		channel.permissionOverwrites.edit(interaction.user, { VIEW_CHANNEL: true });
 		await interaction.reply({ content: `> Successully added you to ${channel.toString()}`, ephemeral: true });
