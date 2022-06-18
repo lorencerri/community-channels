@@ -23,7 +23,7 @@ export class UserRoute extends Route {
 			response.writeHead(200, {
 				'Content-Type': 'image/png',
 				'Content-Length': stat.size,
-			})
+			});
 			const readStream = createReadStream(`./files/${id}/${index}.png`);
 			readStream.pipe(response);
 		} else return response.json({ message: 'File not found' });

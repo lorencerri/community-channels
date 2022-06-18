@@ -34,7 +34,7 @@ export class GUICommand extends Command {
 		} else {
 			const message = await interaction.channel.send('> Generating GUI, please wait...');
 			await container.db.set(`gui_${interaction.guild.id}`, message.url);
-			interaction.reply({ content: `> Successfully created a new GUI message.`, ephemeral: true })
+			interaction.reply({ content: `> Successfully created a new GUI message.`, ephemeral: true });
 		}
 
 		await updateGUI(interaction.guild);

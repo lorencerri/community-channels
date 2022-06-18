@@ -48,7 +48,7 @@ export class JoinCommand extends Command {
 		for (const [_, category] of categories) {
 			if (category.type === 'GUILD_CATEGORY') {
 				for (const [_, channel] of category.children) {
-					if (channel.name.toLowerCase().includes(query)) children.push({ name: channel.name, value: channel.id })
+					if (channel.name.toLowerCase().includes(query)) children.push({ name: channel.name, value: channel.id });
 				}
 			}
 		}
