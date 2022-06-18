@@ -40,7 +40,7 @@ export class PortalCommand extends Command {
 			.setColor(0x8087f6)
 			.setThumbnail('https://fs.plexidev.org/api/UzNMDpe.gif')
 			.setTitle('A Portal Was Created!')
-			.setDescription(`**#${channel.name}** has ${channel.members.size.toLocaleString("en-US")} members and was created ${timeAgo}.`)
+			.setDescription(`**#${channel.name}** has ${channel.permissionOverwrites.cache.size.toLocaleString("en-US")} members and was created ${timeAgo}.`)
 			.setFooter({ text: `Portal created by ${interaction.user.tag}.` })
 
 		const rows = new MessageActionRow().addComponents(new MessageButton().setLabel('Join Page').setCustomId(`join_${channel.id}`).setStyle('PRIMARY'));

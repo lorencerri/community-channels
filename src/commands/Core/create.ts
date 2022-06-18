@@ -38,9 +38,9 @@ export class CreateCommand extends Command {
 		if (hasPermissionsIn >= 2 && !member.permissions.has('MANAGE_GUILD')) return interaction.reply({ embeds: [embed.setDescription('Sorry, you\'re already managing 2 channels.')] })
 
 		// Get the active category
-		const categoryId: string = await this.container.db.get(`categories_${interaction.guild.id}`) || '';
-		if (!categoryId) throw new Error("> Sorry, this server doesn't have the active category set.");
-		const category = await interaction.guild.channels.fetch(categoryId);
+		const activeCategoryId: string = await this.container.db.get(`activeCategory_${interaction.guild.id}`) || '';
+		if (!activeCategoryId) throw new Error("> Sorry, this server doesn't have the active category set.");
+		const category = await interaction.guild.channels.fetch(activeCategoryId);
 		if (category === null || category.type !== 'GUILD_CATEGORY') throw new Error('> Sorry, the active category is not a category.');
 
 		// Create the channel in the active category

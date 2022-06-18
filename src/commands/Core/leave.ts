@@ -31,7 +31,7 @@ export class LeaveCommand extends Command {
 		if (!categoryIds.includes(channel.parentId)) return await interaction.reply({ content: `> Sorry, that channel is not leavable.`, ephemeral: true });
 
 		channel.permissionOverwrites.edit(interaction.user, { VIEW_CHANNEL: false });
-		await interaction.reply(`> Successully removed you from ${channel.toString()}`);
+		await interaction.reply({ content: `> Successully removed you from ${channel.toString()}`, ephemeral: true });
 
 		await updateGUI(interaction.guild);
 	}
