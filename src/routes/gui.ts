@@ -14,6 +14,8 @@ export class UserRoute extends Route {
 		const { params } = request;
 		let { id, index } = params;
 
+		if (!id.match(/^[0-9a-f]{24}$/)) return response.status(404).end();
+		if (!index.match(/^[0-9]+$/)) return response.status(404).end();
 		if (index.includes('.')) index = index.split('.')[0];
 
 		const stat = statSync(`./files/${id}/${index}.png`);
@@ -24,8 +26,6 @@ export class UserRoute extends Route {
 			})
 			const readStream = createReadStream(`./files/${id}/${index}.png`);
 			readStream.pipe(response);
-		} else {
-			response.json({ message: 'File not found' });
-		}
+		} else return response.json({ message: 'File not found' });
 	}
 }

@@ -9,8 +9,8 @@ import {
 import { updateGUI } from '../../lib/utils';
 
 @ApplyOptions<CommandOptions>({
-	name: 'join',
-	description: 'Joins a channel.',
+	name: 'leave',
+	description: 'Leaves a channel.',
 	requiredClientPermissions: ['EMBED_LINKS', 'MANAGE_CHANNELS'],
 	chatInputCommand: {
 		register: true,
@@ -27,21 +27,26 @@ export class CategoriesCommand extends Command {
 		const channel = await interaction.guild.channels.fetch(id);
 		if (!channel) throw new Error("Sorry, I could not find a channel with that ID.")
 		if (!channel.parentId) throw new Error("Sorry, that channel is not part of a category.");
-		if (!categoryIds.includes(channel.parentId)) throw new Error("Sorry, that channel is not joinable.");
+		if (!categoryIds.includes(channel.parentId)) throw new Error("Sorry, that channel is not leavable.");
 
-		channel.permissionOverwrites.edit(interaction.user, { VIEW_CHANNEL: true });
-		await interaction.reply(`> Successully added you to ${channel.toString()}`);
+		channel.permissionOverwrites.edit(interaction.user, { VIEW_CHANNEL: false });
+		await interaction.reply(`> Successully remove you from ${channel.toString()}`);
 
 		await updateGUI(interaction.guild);
 	}
 
 	public async autocompleteRun(...[interaction]: Parameters<AutocompleteCommand['autocompleteRun']>) {
 		if (!interaction.guild) throw new Error('Sorry, this command can only run in guilds.');
+
 		const query = (String(interaction.options.getFocused()) || "").trim().toLowerCase();
 
 		const categoryIds: String[] = await container.db.get(`categories_${interaction.guild.id}`) || [];
 		const channels = await interaction.guild.channels.fetch();
-		const categories = channels.filter(c => categoryIds.includes(c.id));
+		const categories = channels.filter(c => {
+			const permissions = c.permissionsFor(interaction.user);
+			if (!categoryIds.includes(c.id) || !permissions?.has('VIEW_CHANNEL')) return false;
+			else return true;
+		});
 		const children = [];
 
 		for (const [_, category] of categories) {
@@ -58,10 +63,10 @@ export class CategoriesCommand extends Command {
 	registerApplicationCommands(registry: Command.Registry) {
 		registry.registerChatInputCommand((builder) =>
 			builder
-				.setName('join')
-				.setDescription('Joins a channel')
+				.setName('leave')
+				.setDescription('Leaves a channel')
 				.addStringOption(option => //
-					option.setName('id').setDescription('The name of the channel to join').setRequired(true).setAutocomplete(true)),
+					option.setName('id').setDescription('The name of the channel to leave').setRequired(true).setAutocomplete(true)),
 			{ behaviorWhenNotIdentical: RegisterBehavior.Overwrite }
 		);
 	}
