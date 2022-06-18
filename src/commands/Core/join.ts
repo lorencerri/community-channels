@@ -6,7 +6,6 @@ import {
 	container,
 	RegisterBehavior,
 } from '@sapphire/framework';
-import { updateGUI } from '../../lib/utils';
 
 @ApplyOptions<CommandOptions>({
 	name: 'join',
@@ -19,6 +18,7 @@ import { updateGUI } from '../../lib/utils';
 })
 export class JoinCommand extends Command {
 	async chatInputRun(interaction: Command.ChatInputInteraction) {
+		console.log(`Join Command: ${interaction.user.tag} -> #${interaction.options.getString('name')}`);
 		if (!interaction.guild) throw new Error('Sorry, this command can only run in guilds.');
 
 		const id = String(interaction.options.get('name')?.value) || '';
@@ -32,8 +32,6 @@ export class JoinCommand extends Command {
 
 		channel.permissionOverwrites.edit(interaction.user, { VIEW_CHANNEL: true });
 		await interaction.reply({ content: `> Successully added you to ${channel.toString()}`, ephemeral: true });
-
-		await updateGUI(interaction.guild);
 	}
 
 	public async autocompleteRun(...[interaction]: Parameters<AutocompleteCommand['autocompleteRun']>) {

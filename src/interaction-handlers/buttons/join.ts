@@ -1,7 +1,6 @@
 import { container, InteractionHandler, InteractionHandlerTypes } from '@sapphire/framework';
 import { ApplyOptions } from '@sapphire/decorators';
 import type { ButtonInteraction } from 'discord.js';
-import { updateGUI } from '../../lib/utils';
 
 @ApplyOptions<InteractionHandler.Options>({
 	interactionHandlerType: InteractionHandlerTypes.Button
@@ -21,7 +20,5 @@ export class JoinInteractionHandler extends InteractionHandler {
 
 		channel.permissionOverwrites.edit(interaction.user, { VIEW_CHANNEL: true });
 		await interaction.reply({ content: `> Successully added you to ${channel.toString()}`, ephemeral: true });
-
-		await updateGUI(interaction.guild);
 	}
 }

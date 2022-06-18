@@ -6,7 +6,6 @@ import {
 	container,
 	RegisterBehavior,
 } from '@sapphire/framework';
-import { updateGUI } from '../../lib/utils';
 
 @ApplyOptions<CommandOptions>({
 	name: 'leave',
@@ -32,8 +31,6 @@ export class LeaveCommand extends Command {
 
 		channel.permissionOverwrites.edit(interaction.user, { VIEW_CHANNEL: false });
 		await interaction.reply({ content: `> Successully removed you from ${channel.toString()}`, ephemeral: true });
-
-		await updateGUI(interaction.guild);
 	}
 
 	public async autocompleteRun(...[interaction]: Parameters<AutocompleteCommand['autocompleteRun']>) {
