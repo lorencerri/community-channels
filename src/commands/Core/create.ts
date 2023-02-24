@@ -29,8 +29,8 @@ export class CreateCommand extends Command {
 		// Validate channel name
 		if (name.length === 0) return interaction.reply({ embeds: [embed.setDescription('Please provide a channel name.')] })
 
-		// Check if they have the editor role
-		if (!member.roles.cache.find(r => r.name === 'Editor')) return interaction.reply({ embeds: [embed.setDescription('Sorry, you need the editor role to create pages.')] })
+		// Check if they have the editor or creator role
+		if (!member.roles.cache.find(r => r.name === 'Editor' || r.name === 'Creator')) return interaction.reply({ embeds: [embed.setDescription('Sorry, you need the editor role to create pages.')] })
 
 		// Check if they already are managers of 2 channels
 		const channels = await interaction.guild.channels.fetch();
