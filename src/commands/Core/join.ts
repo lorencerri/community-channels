@@ -6,6 +6,7 @@ import {
 	container,
 	RegisterBehavior,
 } from '@sapphire/framework';
+import { MessageActionRow, MessageButton } from 'discord.js';
 
 @ApplyOptions<CommandOptions>({
 	name: 'join',
@@ -31,7 +32,10 @@ export class JoinCommand extends Command {
 		if (!categoryIds.includes(channel.parentId)) return await interaction.reply({ content: `> Sorry, that channel is not joinable.`, ephemeral: true });
 
 		channel.permissionOverwrites.edit(interaction.user, { VIEW_CHANNEL: true });
-		await interaction.reply({ content: `> Successully added you to ${channel.toString()}`, ephemeral: true });
+
+		const rows = new MessageActionRow().addComponents(new MessageButton().setLabel('Follow').setCustomId(`join_${channel.id}`).setStyle('PRIMARY'));
+
+		await interaction.reply({ content: `> You were successfully added to ${channel.toString()}`, components: [rows] });
 	}
 
 	public async autocompleteRun(...[interaction]: Parameters<AutocompleteCommand['autocompleteRun']>) {
