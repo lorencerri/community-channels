@@ -23,7 +23,7 @@ export class InfoCommand extends Command {
 			.setColor(0x8087f6)
 			.setDescription(`**The search engine is back online!** You can create pages using \`/create <name>\`, assuming you have the editor role. If you have an existing page, ping <@144645791145918464> to get access to manage it. Also, the source code is available [here](https://github.com/lorencerri/community-channels) if you want to check it out. **Enjoy!**`)
 			.setThumbnail('https://fs.plexidev.org/api/UzNMDpe.gif')
-		interaction.channel?.send({ embeds: [embed] });
+		interaction.reply({ embeds: [embed] });
 	}
 
 	registerApplicationCommands(registry: Command.Registry) {
