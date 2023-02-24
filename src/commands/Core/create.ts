@@ -63,12 +63,12 @@ export class CreateCommand extends Command {
 			.setThumbnail('https://fs.plexidev.org/api/JBNtvtm.gif')
 			.setFooter({ text: 'And remember, Merchantsoft is always watching!' })
 
-		// Add Join Button
-		const rows = new MessageActionRow().addComponents(new MessageButton().setLabel('Join').setCustomId(`join_${channel.id}`).setStyle('PRIMARY'));
-		await interaction.reply({ embeds: [embed.setDescription(`The page \`${name}\` has been created!`)], components: [rows] });
+
+		await channel.send({ embeds: [embed], content: `${member.toString()}, over here!` });
 
 		// Update the GUI
-		await interaction.reply(`> Created channel \`${name}\`...`)
+		const rows = new MessageActionRow().addComponents(new MessageButton().setLabel('Join Page').setCustomId(`join_${channel.id}`).setStyle('PRIMARY'));
+		await interaction.reply({ content: `> Created channel \`${name}\`...`, components: [rows] })
 		await updateGUI(interaction.guild);
 	}
 
