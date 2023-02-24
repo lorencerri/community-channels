@@ -46,7 +46,7 @@ export class GUICommand extends Command {
 				.setName('gui')
 				.setDescription('Creates a GUI')
 				.addStringOption(option => //
-					option.setName('message').setDescription('A link to the message you want to overwrite')),
+					option.setName('message_url').setDescription('A link to the message you want to overwrite')),
 			{ behaviorWhenNotIdentical: RegisterBehavior.Overwrite }
 		);
 	}
