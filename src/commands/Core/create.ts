@@ -4,7 +4,7 @@ import {
 	CommandOptions,
 	RegisterBehavior,
 } from '@sapphire/framework';
-import { MessageEmbed } from 'discord.js';
+import { MessageActionRow, MessageButton, MessageEmbed } from 'discord.js';
 import { updateGUI } from '../../lib/utils';
 
 @ApplyOptions<CommandOptions>({
@@ -24,7 +24,7 @@ export class CreateCommand extends Command {
 		const member = await interaction.guild.members.fetch(interaction.user.id);
 
 		const embed = new MessageEmbed()
-			.setColor(0x8349c3)
+			.setColor(0x8087f6)
 
 		// Validate channel name
 		if (name.length === 0) return interaction.reply({ embeds: [embed.setDescription('Please provide a channel name.')] })
@@ -63,7 +63,9 @@ export class CreateCommand extends Command {
 			.setThumbnail('https://fs.plexidev.org/api/JBNtvtm.gif')
 			.setFooter({ text: 'And remember, Merchantsoft is always watching!' })
 
-		await channel.send({ embeds: [embed], content: `${member.toString()}, over here!` });
+		// Add Join Button
+		const rows = new MessageActionRow().addComponents(new MessageButton().setLabel('Join').setCustomId(`join_${channel.id}`).setStyle('PRIMARY'));
+		await interaction.reply({ embeds: [embed.setDescription(`The page \`${name}\` has been created!`)], components: [rows] });
 
 		// Update the GUI
 		await interaction.reply(`> Created channel \`${name}\`...`)
