@@ -6,7 +6,9 @@ import {
 	container,
 	RegisterBehavior,
 } from '@sapphire/framework';
-import { MessageActionRow, MessageButton } from 'discord.js';
+import { MessageActionRow, MessageButton, MessageEmbed } from 'discord.js';
+import TimeAgo from 'javascript-time-ago'
+import en from 'javascript-time-ago/locale/en'
 
 @ApplyOptions<CommandOptions>({
 	name: 'join',
@@ -35,7 +37,16 @@ export class JoinCommand extends Command {
 
 		const rows = new MessageActionRow().addComponents(new MessageButton().setLabel('Follow').setCustomId(`join_${channel.id}`).setStyle('PRIMARY'));
 
-		await interaction.reply({ content: `> You were successfully added to ${channel.toString()}`, components: [rows] });
+		TimeAgo.addDefaultLocale(en);
+		const timeAgo = (new TimeAgo('en-US')).format(channel.createdTimestamp)
+
+		const embed = new MessageEmbed()
+			.setColor(0x8087f6)
+			.setThumbnail('https://fs.plexidev.org/api/UzNMDpe.gif')
+			.setTitle('Page Joined!')
+			.setDescription(`You were added to ${channel.toString()}! This channel has ${channel.permissionOverwrites.cache.size.toLocaleString("en-US")} viewers and was created ${timeAgo}.`)
+
+		await interaction.reply({ embeds: [embed], components: [rows] });
 	}
 
 	public async autocompleteRun(...[interaction]: Parameters<AutocompleteCommand['autocompleteRun']>) {
